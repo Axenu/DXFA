@@ -12,5 +12,7 @@ int main()
     }
 
     delete game;
+    int i = 0;
+    std::cin >> i;
     return 0;
 }
