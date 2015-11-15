@@ -1,7 +1,14 @@
 #include <FA/FAEngine.h>
 
+    //message callback?
+    LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 FAEngine::FAEngine() {
 
+}
+
+FAEngine::FAEngine(HINSTANCE hInstance) {
+    this->hInstance = hInstance;
 }
 
 void FAEngine::initLibraries() {
@@ -27,7 +34,7 @@ void FAEngine::initEngine() {
     //Set some defaults to make sure everything works "Out of the box"
 
     this->windowWidth = 1024;
-    this->windowHeigth = 720;
+    this->windowHeight = 720;
     this->samples = 0;
     this->windowTitle = "FAGame";
     //this->windowColor = glm::vec3(0.5,0.5,0.5);
@@ -61,7 +68,7 @@ void FAEngine::render() {
 
 void FAEngine::setWindowsSize(int width, int height) {
     this->windowWidth = width;
-    this->windowHeigth = height;
+    this->windowHeight = height;
 }
 
 void FAEngine::setWindowTitle(std::string title) {
@@ -85,7 +92,7 @@ void FAEngine::setScene(FAScene* newScene) {
     activeScene = newScene;
     activeScene->setCallback(this);
     // activeScene->setShaderNode(shaders);
-    activeScene->setWindowSize(windowWidth, windowHeigth);
+    activeScene->setWindowSize(windowWidth, windowHeight);
     activeScene->onInit();
 }
 
@@ -149,6 +156,56 @@ bool FAEngine::shouldTerminate() {
 }
 
 void FAEngine::setupWindow() {
+
+  WNDCLASSEX wc;    //Create a new extended windows class
+
+  	wc.cbSize = sizeof(WNDCLASSEX);    //Size of our windows class
+  	wc.style = CS_HREDRAW | CS_VREDRAW;    //class styles
+  	wc.lpfnWndProc = WndProc;    //Default windows procedure function
+  	wc.cbClsExtra = NULL;    //Extra bytes after our wc structure
+  	wc.cbWndExtra = NULL;    //Extra bytes after our windows instance
+  	wc.hInstance = hInstance;    //Instance to current application
+  	wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);    //Title bar Icon
+  	wc.hCursor = LoadCursor(NULL, IDC_ARROW);    //Default mouse Icon
+  	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 2);    //Window bg color
+  	wc.lpszMenuName = NULL;    //Name of the menu attached to our window
+  	wc.lpszClassName = WndClassName;    //Name of our windows class
+  	wc.hIconSm = LoadIcon(NULL, IDI_WINLOGO); //Icon in your taskbar
+
+  	if (!RegisterClassEx(&wc))    //Register our windows class
+  	{
+  		//if registration failed, display error
+  		MessageBox(NULL, "Error registering class",
+  			"Error", MB_OK | MB_ICONERROR);
+  		return;
+  	}
+
+    hwnd = CreateWindowEx(    //Create our Extended Window
+		NULL,    //Extended style
+		WndClassName,    //Name of our windows class
+		"Window Title",    //Name in the title bar of our window
+		WS_OVERLAPPEDWINDOW,    //style of our window
+		CW_USEDEFAULT, CW_USEDEFAULT,    //Top left corner of window
+		this->windowWidth,    //Width of our window
+		this->windowHeight,    //Height of our window
+		NULL,    //Handle to parent window
+		NULL,    //Handle to a Menu
+		hInstance,    //Specifies instance of current program
+		NULL    //used for an MDI client window
+		);
+
+	if (!hwnd)    //Make sure our window has been created
+	{
+		//If not, display error
+		MessageBox(NULL, "Error creating window",
+			"Error", MB_OK | MB_ICONERROR);
+		return;
+	}
+
+	ShowWindow(hwnd, 1);    //Shows our window
+	UpdateWindow(hwnd);    //Its good to update our window
+
+
 //     setWindowAttributes();
 //     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //something with forward compatible
 //     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // no idea yet! TODO research
@@ -187,6 +244,31 @@ void FAEngine::setupWindow() {
 //     glEnable(GL_DEPTH_TEST);
 //     glDepthFunc(GL_LEQUAL);
 
+}
+
+LRESULT CALLBACK WndProc(HWND hwnd,UINT msg,	WPARAM wParam, LPARAM lParam) {
+	switch (msg) {
+
+	case WM_KEYDOWN:    //For a key down
+						//if escape key was pressed, display popup box
+		if (wParam == VK_ESCAPE) {
+			if (MessageBox(0, "Are you sure you want to exit?",
+				"Really?", MB_YESNO | MB_ICONQUESTION) == IDYES)
+
+				//Release the windows allocated memory
+				DestroyWindow(hwnd);
+		}
+		return 0;
+
+	case WM_DESTROY:    //if x button in top right was pressed
+		PostQuitMessage(0);
+		return 0;
+	}
+	//return the message for windows to handle it
+	return DefWindowProc(hwnd,
+		msg,
+		wParam,
+		lParam);
 }
 
 FAScene* FAEngine::setInitialScene() {

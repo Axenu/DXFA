@@ -1,10 +1,10 @@
 #include <iostream>
+#include <windows.h>
 #include "Game.h"
 
-int main()
-{
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
-     Game *game = new Game();
+     Game *game = new Game(hInstance);
 
     while (game->shouldTerminate()) {
         game->update();

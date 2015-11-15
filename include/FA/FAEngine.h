@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <windows.h>
 #include "FAScene.h"
 #include "FireArrow.h"
 
@@ -13,17 +14,24 @@ private:
 //    static FAEngine instance;
 
     FAScene* activeScene;
+    LPCTSTR WndClassName = "FAWindow";
+    HWND hwnd = NULL;
     // GLFWwindow* window;
 
 
     float lastBufferedTime;
+
 
     void initLibraries();
     float tpf();
     void setupWindow();
 
 public:
+
+    HINSTANCE hInstance;
+
     FAEngine();
+    FAEngine(HINSTANCE hInstance);
 
     void update();
     void render();
@@ -59,7 +67,7 @@ public:
 protected:
 
     int windowWidth;
-    int windowHeigth;
+    int windowHeight;
     int samples;
     std::string windowTitle;
     // glm::vec3 windowColor;

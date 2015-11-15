@@ -4,6 +4,11 @@ Game::Game() {
     initEngine();
 }
 
+Game::Game(HINSTANCE hInstance) {
+  this->hInstance = hInstance;
+    initEngine();
+}
+
 void Game::init() {
 
 }
