@@ -53,6 +53,27 @@ void FAEngine::initEngine() {
     init();
 }
 
+void FAEngine::run() {
+  MSG msg;    //Create a new message structure
+ZeroMemory(&msg, sizeof(MSG));
+
+ while (true) {
+   if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+   if (msg.message == WM_QUIT)    //if the message was WM_QUIT
+     break;    //Exit the message loop
+
+   TranslateMessage(&msg);    //Translate the message
+
+                  //Send the message to default windows procedure
+   DispatchMessage(&msg);
+ } else {
+     this->update();
+     this->render();
+
+ }
+ }
+}
+
 void FAEngine::update() {
     activeScene->onUpdate(tpf());
 }
@@ -150,10 +171,6 @@ void FAEngine::swapScene(FAScene* scene) {
 //     activeScene->getCursorPosition(x, y);
 // }
 //
-bool FAEngine::shouldTerminate() {
-    // return !glfwWindowShouldClose(window);
-    return false;
-}
 
 void FAEngine::setupWindow() {
 
@@ -265,10 +282,7 @@ LRESULT CALLBACK WndProc(HWND hwnd,UINT msg,	WPARAM wParam, LPARAM lParam) {
 		return 0;
 	}
 	//return the message for windows to handle it
-	return DefWindowProc(hwnd,
-		msg,
-		wParam,
-		lParam);
+	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 FAScene* FAEngine::setInitialScene() {

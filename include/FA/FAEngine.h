@@ -16,6 +16,8 @@ private:
     FAScene* activeScene;
     LPCTSTR WndClassName = "FAWindow";
     HWND hwnd = NULL;
+
+    bool shouldQuit = false;
     // GLFWwindow* window;
 
 
@@ -35,6 +37,7 @@ public:
 
     void update();
     void render();
+    void run();
 
     void setWindowsSize(int width, int height);
     void setWindowTitle(std::string title);
@@ -57,8 +60,6 @@ public:
     // void forwardMouseKeyInput(int button, int action);
     // static void cursorPosition_callback(GLFWwindow* win, double x, double y);
     // void forwardcursorPosition(double x, double y);
-
-    bool shouldTerminate();
 
     virtual void setWindowAttributes(){}
 
